@@ -1,17 +1,91 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Example Configuration</title>
+  <title>simplr2 - Configuration</title>
+  <link rel='stylesheet' type='text/css' href='css/slate.min.css'>
+  <script src='js/slate.min.js'></script>
+  <style>
+  .title {
+    padding: 15px 10px;
+    text-transform: uppercase;
+    font-family: 'PT Sans', sans-serif;
+    font-size: 1.2em;
+    font-weight: 500;
+    color: #888888;
+    text-align: center;
+  }
+  </style>
   </head>
+
   <body>
-    <p>This is an example HTML forms configuration page.</p>
+    <h1 class='title'>simplr2 - Configuration</h1>
 
-    <input id='24_hours_checkbox' type='checkbox'>
-      Enable 24 hours time
-    </input>
-    <input id='submit_button' type='button' value='Save'>
+    <div class='item-container'>
+      <div class='item-container-content'>
+        <div class='item'>
+          Use this configuration page to choose the settings you would like applied to this app.
+        </div>
+      </div>
+    </div>
 
+    <div class='item-container'>
+      <div class='item-container-header'>General Settings</div>
+      <div class='item-container-content'>
+        <label class='item'>
+          24-hour time mode
+          <input id='hours_24_checkbox' type='checkbox' class='item-toggle'>
+        </label>
+      </div>
+      <div class='item-container-footer'>
+        Use 24-hour format instead of am/pm.
+      </div>
+    </div>
 
-
+    <div class='item-container'>
+      <div class='button-container'>
+        <input id='submit_button' type='button' class='item-button' value='Save'>
+      </div>
+    </div>
   </body>
+
+  <script>
+  function getConfigData() {
+    var hours24Checkbox = document.getElementById('hours_24_checkbox');
+ 
+    var options = {
+      'hours_24': hours24Checkbox.checked
+    };
+    // Save for next launch
+    localStorage['hours_24'] = options['hours_24'];
+    console.log('Got options: ' + JSON.stringify(options));
+    return options;
+  }
+
+  function getQueryParam(variable, defaultValue) {
+    var query = location.search.substring(1);
+    var vars = query.split('&');
+    for (var i = 0; i < vars.length; i++) {
+      var pair = vars[i].split('=');
+      if (pair[0] === variable) {
+        return decodeURIComponent(pair[1]);
+      }
+    }
+    return defaultValue || false;
+  }
+ 
+  var submitButton = document.getElementById('submit_button');
+  submitButton.addEventListener('click', function() {
+    console.log('Submit');
+    // Set the return URL depending on the runtime environment
+    var return_to = getQueryParam('return_to', 'pebblejs://close#');
+    document.location = return_to + encodeURIComponent(JSON.stringify(getConfigData()));
+  });
+  (function() {
+    var hours24Checkbox = document.getElementById('hours_24_checkbox');
+    // Load any previously saved configuration, if available
+    if(localStorage['hours_24']) {
+      hours24Checkbox.checked = JSON.parse(localStorage['hours_24']);
+    }
+  })();
+  </script>
 </html>
